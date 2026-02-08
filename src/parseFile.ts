@@ -2,16 +2,14 @@ import { promises as fs} from "fs"
 
 interface TimeBlock {
     name: string,
-    time: number
+    startTime: number,
+    endTime: number
 }
-
-const schedule: TimeBlock[] = []
-
-                                                                                                                               
-
+                                                                                                                        
 const parseFile = async (file: string) => {
+    const schedule: TimeBlock[] = []
     
-    function getTime(val: string, len: number, ind: number): { time: number, newInd: number } {
+    function getTime(val: string, ind: number): { time: number, newInd: number } {
         try{
             let time = 0;
             let curr = ''
@@ -30,10 +28,12 @@ const parseFile = async (file: string) => {
                 ind++;
             }
             curr = curr.replace(/\s/g, '');
-            if(curr[curr.length-1]==='m' && curr[curr.length-2]==='p'){
+            if(curr[curr.length-1]==='m'){
+                if(curr[curr.length-2]==='p'){
+                    if(time!==720)
+                    time+=720
+                }
                 curr = curr.slice(0, -2);
-                if(time!==720)
-                time+=720
             }else if(time=== 720){
                 time=0;
             }
@@ -51,10 +51,10 @@ const parseFile = async (file: string) => {
         } 
     }
 
-    function addToSchedule(val: string): void{
+    function addToSchedule(val: string): boolean{
         val = val.trim();
         if(val.split(':').length<3 || !val.includes('-') || val===''){
-            return;
+            return false;
         }
         //console.log(val)
         let startTime;
@@ -66,19 +66,22 @@ const parseFile = async (file: string) => {
         while(ind<len && (val[ind] === ' ' || isNaN(Number(val[ind])))){
             ind++;
         }
-        if( ind ===len ) return;
-        let ret = getTime(val, len, ind);
-        if(ret.newInd === -1) return;
+        if( ind ===len ) return false;
+        let ret = getTime(val, ind);
+        if(ret.newInd === -1) return false;
         startTime = ret.time;
         ind = ret.newInd;
         //console.log(startTime)
         while(ind<len && (val[ind] === ' ' || isNaN(Number(val[ind])))){
             ind++;
         }
-        if( ind ===len ) return;
-        ret = getTime(val, len, ind);
-        if(ret.newInd === -1) return;
+        if( ind ===len ) return false;
+        ret = getTime(val, ind);
+        if(ret.newInd === -1) return false;
         endTime = ret.time;
+        if(endTime<=startTime){
+            endTime+=1440
+        }
         ind = ret.newInd;
         //console.log(endTime)
         while(val[ind]===' '){
@@ -88,18 +91,35 @@ const parseFile = async (file: string) => {
         //console.log(name)
         schedule.push({
             name: name,
-            time: endTime-startTime
+            startTime: startTime,
+            endTime: endTime
         })
+        return true;
     }
 
     async function parse() {
         const contents = await fs.readFile(`./sourceFile/${file}`, "utf8");
         let lines: string[] = contents.split(/\r?\n/)
-
-        lines.forEach(val => addToSchedule(val));
+        let minTime = 1440;
+        let maxTime = 0;
+        lines.forEach(val => {
+            if(addToSchedule(val)){
+                minTime = Math.min(minTime, schedule[schedule.length-1].startTime)
+                maxTime = Math.max(maxTime, schedule[schedule.length-1].endTime)
+            }
+        });
+        return {
+            minTime: minTime,
+            maxTime: maxTime
+        }
     }
-    await parse();
-    return schedule
+    const criticalTimes = await parse();
+    schedule.sort((a, b) => a.startTime - b.startTime)
+    return {
+        schedule,
+        early: criticalTimes.minTime,
+        latest: criticalTimes.maxTime
+    }
 }
 
 export default parseFile
