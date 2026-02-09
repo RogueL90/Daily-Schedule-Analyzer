@@ -1,7 +1,7 @@
 # Day planner
 
-- [ ] 10:30am - 11:30 Apply Internships
 - [x] 10:00 - 10:15 Milk + wake up
+- [ ] 10:30am - 11:30 Apply Internships
 - [ ] 11:45 - 1:30pm Set up video system (AE, Subtitles, Mascot, Visuals)
 - [x] 1:30pm - 2:00pm Eat Lunch
 - [ ] 2:45pm - 5:00pm Project 1

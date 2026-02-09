@@ -1,9 +1,10 @@
 import parseFile from "./parseFile"
+import printSchedule from "./printSchedule"
 
 async function parser(){
 const res = await parseFile("myFile.txt")
-console.log(res)
+printSchedule(res)
 return res;
 }
 
-parser();
+const info = parser();
