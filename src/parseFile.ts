@@ -117,7 +117,7 @@ const parseFile = async (file: string) => {
     schedule.sort((a, b) => a.startTime - b.startTime)
     return {
         schedule,
-        early: criticalTimes.minTime,
+        earliest: criticalTimes.minTime,
         latest: criticalTimes.maxTime
     }
 }
