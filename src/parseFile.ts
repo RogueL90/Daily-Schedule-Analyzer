@@ -98,7 +98,7 @@ const parseFile = async (file: string) => {
     }
 
     async function parse() {
-        const contents = await fs.readFile(`./sourceFile/${file}`, "utf8");
+        const contents = await fs.readFile(`./plannerDir/${file}`, "utf8");
         let lines: string[] = contents.split(/\r?\n/)
         let minTime = 1440;
         let maxTime = 0;
