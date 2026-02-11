@@ -15,7 +15,9 @@ const convTime = (val) => {
     }
     else {
         meridiem = "pm";
-        hour -= 12;
+        if (hour > 12) {
+            hour -= 12;
+        }
     }
     return "" + hour + ":" + (minutes < 10 ? 0 + "" + minutes : minutes) + meridiem;
 };

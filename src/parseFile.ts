@@ -1,4 +1,5 @@
 import { promises as fs} from "fs"
+import path from 'node:path'
 
 interface TimeBlock {
     name: string,
@@ -34,8 +35,6 @@ const parseFile = async (file: string) => {
                     time+=720
                 }
                 curr = curr.slice(0, -2);
-            }else if(time=== 720){
-                time=0;
             }
             time+=Number(curr);
             return {
@@ -115,10 +114,13 @@ const parseFile = async (file: string) => {
     }
     const criticalTimes = await parse();
     schedule.sort((a, b) => a.startTime - b.startTime)
+    let date = path.basename(`./plannerDir/${file}`)
+    date = date.slice(0,-3)
     return {
         schedule,
+        date: date,
         earliest: criticalTimes.minTime,
-        latest: criticalTimes.maxTime
+        latest: criticalTimes.maxTime,
     }
 }
 

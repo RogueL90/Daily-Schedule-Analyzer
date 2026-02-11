@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
+const node_path_1 = __importDefault(require("node:path"));
 const parseFile = async (file) => {
     const schedule = [];
     function getTime(val, ind) {
@@ -28,9 +32,6 @@ const parseFile = async (file) => {
                         time += 720;
                 }
                 curr = curr.slice(0, -2);
-            }
-            else if (time === 720) {
-                time = 0;
             }
             time += Number(curr);
             return {
@@ -111,10 +112,13 @@ const parseFile = async (file) => {
     }
     const criticalTimes = await parse();
     schedule.sort((a, b) => a.startTime - b.startTime);
+    let date = node_path_1.default.basename(`./plannerDir/${file}`);
+    date = date.slice(0, -3);
     return {
         schedule,
+        date: date,
         earliest: criticalTimes.minTime,
-        latest: criticalTimes.maxTime
+        latest: criticalTimes.maxTime,
     };
 };
 exports.default = parseFile;
