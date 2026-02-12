@@ -1,16 +1,17 @@
-import parseFile from "./parseFile"
-import printSchedule from "./printSchedule"
-import getIdleTime from "./getIdleTime"
+import parseFile from "./utils/parseFile"
+import printSchedule from "./utils/printSchedule"
 import { promises as fs } from "fs"
+import timeSpent from "./utils/timeSpent"
+
+const parsedFiles: any[]= [];
 
 async function parser(){
 const allFiles: string[] = await getAllFiles("")
 for(const planner of allFiles){
     const file = await parseFile(planner)
-    printSchedule(file)
-    console.log("Total idle time of the day: "+getIdleTime(file)+" minutes")
-    console.log("--------------------------------------------------------------------------------------------------------------")
+    parsedFiles.push(file)
 }
+parsedFiles.sort((a, b) => a.date.localeCompare(b.date))
 }
 
 async function getAllFiles(filePath: string){
@@ -30,3 +31,4 @@ async function getAllFiles(filePath: string){
 }
 
 parser();
+

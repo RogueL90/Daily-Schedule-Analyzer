@@ -1,13 +1,15 @@
 import { promises as fs} from "fs"
 import path from 'node:path'
-
+import getIdleTime from "./getIdleTime"
+                          
 interface TimeBlock {
     name: string,
     startTime: number,
     endTime: number
 }
-                                                                                                                        
+
 const parseFile = async (file: string) => {
+    
     const schedule: TimeBlock[] = []
     
     function getTime(val: string, ind: number): { time: number, newInd: number } {
@@ -118,9 +120,10 @@ const parseFile = async (file: string) => {
     date = date.slice(0,-3)
     return {
         schedule,
-        date: date,
+        date,
         earliest: criticalTimes.minTime,
         latest: criticalTimes.maxTime,
+        idle: getIdleTime(schedule, criticalTimes.maxTime - criticalTimes.minTime)
     }
 }
 

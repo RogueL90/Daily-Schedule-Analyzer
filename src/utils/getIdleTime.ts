@@ -1,6 +1,4 @@
-const getIdleTime = (prop: any): number => {
-    const totalTime: number = prop.latest-prop.earliest
-    const schedule = prop.schedule
+const getIdleTime = (schedule: any, totalTime: number): number => {
     let totalPlannedTime: number = 0
     let currStart = 0
     let reach = 0

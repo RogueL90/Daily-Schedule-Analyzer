@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const node_path_1 = __importDefault(require("node:path"));
-const getIdleTime_1 = __importDefault(require("./utils/getIdleTime"));
+const getIdleTime_1 = __importDefault(require("./getIdleTime"));
 const parseFile = async (file) => {
     const schedule = [];
     function getTime(val, ind) {

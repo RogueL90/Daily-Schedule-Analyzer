@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const convTime_1 = __importDefault(require("./utils/convTime"));
+const convTime_1 = __importDefault(require("./convTime"));
 const printSchedule = (prop) => {
     const schedule = prop.schedule;
     console.log("=== " + prop.date + " ===");
