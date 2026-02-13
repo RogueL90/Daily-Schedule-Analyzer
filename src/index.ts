@@ -2,8 +2,14 @@ import parseFile from "./utils/parseFile"
 import printSchedule from "./utils/printSchedule"
 import { promises as fs } from "fs"
 import timeSpent from "./utils/timeSpent"
+import { createInterface } from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
 
 const parsedFiles: any[]= [];
+const helpMessage = [
+    "cmd 1 - does this",
+    "cmd 2 - does that"
+]
 
 async function parser(){
 const allFiles: string[] = await getAllFiles("")
@@ -30,5 +36,25 @@ async function getAllFiles(filePath: string){
     return arr
 }
 
-parser();
+async function Main (){
 
+    await parser()
+    //console.log(parsedFiles)
+    const rl = createInterface({ input, output})
+    
+    while(true){
+        console.log("Enter next command, or --help for all lists of commands")
+        const answer = await rl.question("> ")
+        if(answer == "--help"){
+            for(const line of helpMessage){
+                console.log(line)
+            }
+        }
+    }
+
+    rl.close()
+
+}
+
+console.log("=== Welcome to Markdown Schedule Analyzer! ===")
+Main();

@@ -1,8 +1,13 @@
 const timeSpent = (schedule: any, target: string) => {
     let totalTime = 0
     let reach =0
+    target = target.replace(/\s/g, '')
+    target = target.toLowerCase()
     for(const activity of schedule){
-        if(activity.name != target || activity.endTime<reach){
+        let name = activity.name
+        name = name.toLowerCase()
+        name = name.replace(/\s/g, '')
+        if(name != target || activity.endTime<reach){
             continue
         }
         if(activity.startTime<reach){
