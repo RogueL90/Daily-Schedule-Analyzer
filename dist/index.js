@@ -8,6 +8,7 @@ const fs_1 = require("fs");
 const promises_1 = require("node:readline/promises");
 const node_process_1 = require("node:process");
 const parsedFiles = [];
+let len;
 const helpMessage = [
     "cmd 1 - does this",
     "cmd 2 - does that"
@@ -19,6 +20,7 @@ async function parser() {
         parsedFiles.push(file);
     }
     parsedFiles.sort((a, b) => a.date.localeCompare(b.date));
+    len = parsedFiles.length;
 }
 async function getAllFiles(filePath) {
     let arr = [];
@@ -41,13 +43,80 @@ async function Main() {
     //console.log(parsedFiles)
     const rl = (0, promises_1.createInterface)({ input: node_process_1.stdin, output: node_process_1.stdout });
     while (true) {
-        console.log("Enter next command, or --help for all lists of commands");
-        const answer = await rl.question("> ");
-        if (answer == "--help") {
+        console.log("Enter an argument, or 'sa help' for list of commands");
+        const res = await rl.question("> ");
+        let arg = res.split(" ").slice(1);
+        arg = arg.filter(val => val !== '');
+        arg.forEach(val => val.toLowerCase);
+        const cmd = arg[0];
+        if (cmd === "help") {
             for (const line of helpMessage) {
                 console.log(line);
             }
+            continue;
         }
+        if (cmd === "term") {
+            break;
+        }
+        let data;
+        // Read flags & store schedules to be processed in data variable
+        try {
+            if (arg[1] === '--last') {
+                data = parsedFiles.slice(len - Math.min(len, Number(arg[2])));
+            }
+            else if (arg[1] === '--first') {
+                data = parsedFiles.slice(0, Math.min(len, Number(arg[2])));
+            }
+            else if (arg[1] === '--from') {
+                let from = -1;
+                let to = -1;
+                if (!isNaN(Number(arg[2]))) {
+                    from = Math.min(len - 1, Number(arg[2])) - 1;
+                }
+                else {
+                    for (let i = 0; i < len; i++) {
+                        if (parsedFiles[i].date === arg[2]) {
+                            from = i;
+                            break;
+                        }
+                    }
+                }
+                if (arg[3] !== '--to') {
+                    to = len;
+                }
+                else {
+                    if (!isNaN(Number(arg[4]))) {
+                        to = Number(arg[4]);
+                    }
+                    else {
+                        for (let i = from + 1; i < len; i++) {
+                            if (parsedFiles[i].date > arg[4]) {
+                                to = i;
+                                break;
+                            }
+                            else if (parsedFiles[i].date === arg[4]) {
+                                to = i + 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+                data = parsedFiles.slice(from, to);
+            }
+            else {
+                if (!isNaN(Number(arg[1]))) {
+                    data = parsedFiles[Math.min(len, Number(arg[1]) - 1)];
+                }
+                else {
+                    data = parsedFiles.filter(schedule => schedule.date === arg[1]);
+                }
+            }
+        }
+        catch (error) {
+            console.log(`invalid argument, showing stats for ${cmd} for past ${Math.min(len, 7)} days instead!`);
+            data = parsedFiles.slice(len - Math.min(len, 7));
+        }
+        console.log(data);
     }
     rl.close();
 }
