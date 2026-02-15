@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// Convert minutes to hours and minutes in the form "X hour(s) Y minute(s)"
 const convHrs = (val) => {
     val = Math.round(val);
     const hours = Math.floor(val / 60);

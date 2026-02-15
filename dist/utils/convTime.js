@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// Convert minutes to time form to display parsed schedule data
 const convTime = (val) => {
     val = Math.round(val);
     let hour = Math.floor(val / 60);

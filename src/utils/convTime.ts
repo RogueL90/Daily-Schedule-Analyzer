@@ -1,4 +1,4 @@
-
+// Convert minutes to time form to display parsed schedule data
 const convTime = (val: number) => {
     val = Math.round(val)
     let hour: number = Math.floor(val/60);

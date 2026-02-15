@@ -7,6 +7,7 @@ const timeSpent = (schedule: any, target: string) => {
         let name = activity.name
         name = name.toLowerCase()
         name = name.replace(/\s/g, '')
+        // Reach variable to handle overlapping time intervals
         if(name != target || activity.endTime<reach){
             continue
         }

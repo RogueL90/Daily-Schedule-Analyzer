@@ -5,6 +5,7 @@ const getIdleTime = (schedule, totalTime) => {
     let currStart = 0;
     let reach = 0;
     for (let i = 0; i < schedule.length; i++) {
+        // Reach variable to handle overlapping time intervals
         if (schedule[i].startTime < reach) {
             reach = Math.max(reach, schedule[i].endTime);
         }

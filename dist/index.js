@@ -132,7 +132,7 @@ async function Main() {
                 totalEarliest += day.earliest;
                 totalLatest += day.latest;
                 console.log();
-                console.log(`Idle (unplanned) time: ${(0, convHrs_1.default)(day.idle)} and actual ${day.idle}`);
+                console.log(`Idle (unplanned) time: ${(0, convHrs_1.default)(day.idle)}`);
                 console.log(`Earliest scheduled time: ${(0, convTime_1.default)(day.earliest)}`);
                 console.log(`Latest scheduled time: ${(0, convTime_1.default)(day.latest)}`);
                 console.log();
@@ -150,6 +150,36 @@ async function Main() {
             }
             console.log();
             console.log("----------------------------------------------------------------------------------------------------------");
+        }
+        else if (cmd === 'tasks') {
+            const reduce = (str) => {
+                return str.replace(/\s/g, '').toLowerCase();
+            };
+            let uniqueTasks = new Map();
+            for (let i = 0; i < data.length; i++) {
+                for (const currTask of data[i].schedule) {
+                    const reduced = reduce(currTask.name);
+                    const exists = uniqueTasks.get(reduced);
+                    if (exists) {
+                        exists.timeSpent += currTask.endTime - currTask.startTime;
+                    }
+                    else {
+                        uniqueTasks.set(reduced, { name: currTask.name, timeSpent: currTask.endTime - currTask.startTime });
+                    }
+                }
+            }
+            let tasks = Array.from(uniqueTasks.values());
+            tasks = tasks.sort((a, b) => b.timeSpent - a.timeSpent);
+            for (const task of tasks) {
+                console.log(`${(0, convHrs_1.default)(task.timeSpent)} spent on ${task.name}.`);
+            }
+            console.log();
+            if (data.length === 1) {
+                console.log(`Displayed tasks for ${data[0].date}.`);
+            }
+            else {
+                console.log(`Displayed tasks for dates between ${data[0].date} and ${data[data.length - 1].date}.`);
+            }
         }
     }
     rl.close();
