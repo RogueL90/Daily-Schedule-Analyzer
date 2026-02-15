@@ -4,9 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const parseFile_1 = __importDefault(require("./utils/parseFile"));
+const printSchedule_1 = __importDefault(require("./utils/printSchedule"));
 const fs_1 = require("fs");
 const promises_1 = require("node:readline/promises");
 const node_process_1 = require("node:process");
+const convTime_1 = __importDefault(require("./utils/convTime"));
+const convHrs_1 = __importDefault(require("./utils/convHrs"));
 const parsedFiles = [];
 let len;
 const helpMessage = [
@@ -58,10 +61,13 @@ async function Main() {
         if (cmd === "term") {
             break;
         }
-        let data;
+        let data = [];
         // Read flags & store schedules to be processed in data variable
         try {
-            if (arg[1] === '--last') {
+            if (arg[1] === '--all') {
+                data = parsedFiles;
+            }
+            else if (arg[1] === '--last') {
                 data = parsedFiles.slice(len - Math.min(len, Number(arg[2])));
             }
             else if (arg[1] === '--first') {
@@ -105,10 +111,10 @@ async function Main() {
             }
             else {
                 if (!isNaN(Number(arg[1]))) {
-                    data = parsedFiles[Math.min(len, Number(arg[1]) - 1)];
+                    data.push(parsedFiles[Math.min(len, Number(arg[1]) - 1)]);
                 }
                 else {
-                    data = parsedFiles.filter(schedule => schedule.date === arg[1]);
+                    data.push(parsedFiles.filter(schedule => schedule.date === arg[1]));
                 }
             }
         }
@@ -116,7 +122,35 @@ async function Main() {
             console.log(`invalid argument, showing stats for ${cmd} for past ${Math.min(len, 7)} days instead!`);
             data = parsedFiles.slice(len - Math.min(len, 7));
         }
-        console.log(data);
+        let totalIdle = 0;
+        let totalEarliest = 0;
+        let totalLatest = 0;
+        if (cmd === 'summary') {
+            for (const day of data) {
+                (0, printSchedule_1.default)(day);
+                totalIdle += day.idle;
+                totalEarliest += day.earliest;
+                totalLatest += day.latest;
+                console.log();
+                console.log(`Idle (unplanned) time: ${(0, convHrs_1.default)(day.idle)} and actual ${day.idle}`);
+                console.log(`Earliest scheduled time: ${(0, convTime_1.default)(day.earliest)}`);
+                console.log(`Latest scheduled time: ${(0, convTime_1.default)(day.latest)}`);
+                console.log();
+            }
+            console.log("----------------------------------------------------------------------------------------------------------");
+            console.log();
+            console.log(`Average idle time: ${(0, convHrs_1.default)(totalIdle / data.length)}`);
+            console.log(`Average easliest scheduled time: ${(0, convTime_1.default)(totalEarliest / data.length)}`);
+            console.log(`Average latest scheduled time: ${(0, convTime_1.default)(totalLatest / data.length)}`);
+            if (data.length === 1) {
+                console.log(`Displayed summary for ${data[0].date}.`);
+            }
+            else {
+                console.log(`Displayed summary for dates between ${data[0].date} and ${data[data.length - 1].date}.`);
+            }
+            console.log();
+            console.log("----------------------------------------------------------------------------------------------------------");
+        }
     }
     rl.close();
 }

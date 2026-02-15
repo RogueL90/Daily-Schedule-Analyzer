@@ -1,5 +1,6 @@
 
 const convTime = (val: number) => {
+    val = Math.round(val)
     let hour: number = Math.floor(val/60);
     const minutes: number = val-hour*60;
     let meridiem: string;

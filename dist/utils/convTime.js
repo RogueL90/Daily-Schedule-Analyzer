@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const convTime = (val) => {
+    val = Math.round(val);
     let hour = Math.floor(val / 60);
     const minutes = val - hour * 60;
     let meridiem;

@@ -4,6 +4,8 @@ import { promises as fs } from "fs"
 import timeSpent from "./utils/timeSpent"
 import { createInterface } from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
+import convTime from './utils/convTime'
+import convHrs from './utils/convHrs'
 
 const parsedFiles: any[]= [];
 let len: number;
@@ -63,12 +65,12 @@ async function Main (){
             break;
         }
 
-        let data;
-
+        let data = [];
         // Read flags & store schedules to be processed in data variable
         try{
-
-            if(arg[1]==='--last'){
+            if(arg[1]==='--all'){
+                data = parsedFiles
+            }else if(arg[1]==='--last'){
                 data = parsedFiles.slice(len-Math.min(len, Number(arg[2])))
             }else if(arg[1]==='--first'){
                 data = parsedFiles.slice(0, Math.min(len, Number(arg[2])));
@@ -105,9 +107,9 @@ async function Main (){
                 data = parsedFiles.slice(from, to)
             }else{
                 if(!isNaN(Number(arg[1]))){
-                    data = parsedFiles[Math.min(len,Number(arg[1])-1)]
+                    data.push(parsedFiles[Math.min(len,Number(arg[1])-1)])
                 } else {
-                    data = parsedFiles.filter(schedule => schedule.date===arg[1])
+                    data.push(parsedFiles.filter(schedule => schedule.date===arg[1]))
                 }
             }
 
@@ -116,7 +118,35 @@ async function Main (){
             data = parsedFiles.slice(len-Math.min(len, 7))
         }
 
-        console.log(data)
+        let totalIdle = 0
+        let totalEarliest = 0
+        let totalLatest = 0
+        if(cmd === 'summary'){
+            for(const day of data){
+                printSchedule(day)
+                totalIdle+=day.idle
+                totalEarliest += day.earliest
+                totalLatest += day.latest
+                console.log()
+                console.log(`Idle (unplanned) time: ${convHrs(day.idle)} and actual ${day.idle}`)
+                console.log(`Earliest scheduled time: ${convTime(day.earliest)}`)
+                console.log(`Latest scheduled time: ${convTime(day.latest)}`)
+                console.log()
+            }
+            console.log("----------------------------------------------------------------------------------------------------------")
+            console.log()
+            console.log(`Average idle time: ${convHrs(totalIdle/data.length)}`)
+            console.log(`Average easliest scheduled time: ${convTime(totalEarliest/data.length)}`)
+            console.log(`Average latest scheduled time: ${convTime(totalLatest/data.length)}`)
+            if(data.length===1){
+                console.log(`Displayed summary for ${data[0].date}.`)
+            }else{
+                console.log(`Displayed summary for dates between ${data[0].date} and ${data[data.length-1].date}.`)
+            }
+            console.log()
+            console.log("----------------------------------------------------------------------------------------------------------")
+        }
+
     }
     rl.close()
 
