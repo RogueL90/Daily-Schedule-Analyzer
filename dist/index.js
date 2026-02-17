@@ -61,46 +61,57 @@ async function Main() {
         if (cmd === "term") {
             break;
         }
+        let extra = 0;
+        let taskStr = "";
+        if (cmd === "task") {
+            for (let i = 1; i < arg.length; i++) {
+                if (arg[i].length > 2 && arg[i].slice(0, 2) == '--') {
+                    break;
+                }
+                taskStr += arg[i];
+                extra++;
+            }
+        }
         let data = [];
         // Read flags & store schedules to be processed in data variable
         try {
-            if (arg[1] === '--all') {
+            if (arg[1 + extra] === '--all') {
                 data = parsedFiles;
             }
-            else if (arg[1] === '--last') {
+            else if (arg[1 + extra] === '--last') {
                 data = parsedFiles.slice(len - Math.min(len, Number(arg[2])));
             }
-            else if (arg[1] === '--first') {
+            else if (arg[1 + extra] === '--first') {
                 data = parsedFiles.slice(0, Math.min(len, Number(arg[2])));
             }
-            else if (arg[1] === '--from') {
+            else if (arg[1 + extra] === '--from') {
                 let from = -1;
                 let to = -1;
-                if (!isNaN(Number(arg[2]))) {
-                    from = Math.min(len - 1, Number(arg[2])) - 1;
+                if (!isNaN(Number(arg[2 + extra]))) {
+                    from = Math.min(len - 1, Number(arg[2 + extra])) - 1;
                 }
                 else {
                     for (let i = 0; i < len; i++) {
-                        if (parsedFiles[i].date === arg[2]) {
+                        if (parsedFiles[i].date === arg[2 + extra]) {
                             from = i;
                             break;
                         }
                     }
                 }
-                if (arg[3] !== '--to') {
+                if (arg[3 + extra] !== '--to') {
                     to = len;
                 }
                 else {
-                    if (!isNaN(Number(arg[4]))) {
-                        to = Number(arg[4]);
+                    if (!isNaN(Number(arg[4 + extra]))) {
+                        to = Number(arg[4 + extra]);
                     }
                     else {
                         for (let i = from + 1; i < len; i++) {
-                            if (parsedFiles[i].date > arg[4]) {
+                            if (parsedFiles[i].date > arg[4 + extra]) {
                                 to = i;
                                 break;
                             }
-                            else if (parsedFiles[i].date === arg[4]) {
+                            else if (parsedFiles[i].date === arg[4 + extra]) {
                                 to = i + 1;
                                 break;
                             }
@@ -110,11 +121,11 @@ async function Main() {
                 data = parsedFiles.slice(from, to);
             }
             else {
-                if (!isNaN(Number(arg[1]))) {
-                    data.push(parsedFiles[Math.min(len, Number(arg[1]) - 1)]);
+                if (!isNaN(Number(arg[1 + extra]))) {
+                    data.push(parsedFiles[Math.min(len, Number(arg[1 + extra]) - 1)]);
                 }
                 else {
-                    data.push(parsedFiles.filter(schedule => schedule.date === arg[1]));
+                    data.push(parsedFiles.filter(schedule => schedule.date === arg[1 + extra]));
                 }
             }
         }
@@ -180,6 +191,9 @@ async function Main() {
             else {
                 console.log(`Displayed tasks for dates between ${data[0].date} and ${data[data.length - 1].date}.`);
             }
+        }
+        else if (cmd === 'idle' || cmd === 'task') {
+            const target = taskStr.replace(/\s/g, "").toLowerCase();
         }
     }
     rl.close();
