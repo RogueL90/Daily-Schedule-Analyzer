@@ -189,8 +189,49 @@ async function Main (){
                 console.log(`Displayed tasks for dates between ${data[0].date} and ${data[data.length-1].date}.`)
             }
             
-        } else if(cmd === 'idle' || cmd === 'task') {
+        } else if(cmd === 'task') {
             const target = taskStr.replace(/\s/g, "").toLowerCase()
+            let timeSpentList = []
+            let sum = 0;
+            let max = 0;
+            for(let i = 0; i<data.length; i++){
+                timeSpentList[i] = timeSpent(data[i].schedule, target)
+                sum += timeSpentList[i]
+                max = Math.max(max, timeSpentList[i])
+            }
+            for(let i = 0; i<data.length; i++){
+                process.stdout.write(`${data[i].date}:`);
+                for(let k = 0; k<Math.round((timeSpentList[i]/max)*50); k++){
+                    process.stdout.write('|')
+                }
+                console.log()
+            }
+            if(data.length===1){
+                console.log(`Displayed time spent on ${taskStr} for ${data[0].date}.`)
+            }else{
+                console.log(`Displayed time spent on ${taskStr} for dates between ${data[0].date} and ${data[data.length-1].date}.`)
+            }
+        } else if(cmd === 'idle'){
+            let idleList = []
+            let sum = 0;
+            let max = 0;
+            for(let i = 0; i<data.length; i++){
+                idleList[i] = data[i].idle
+                sum += idleList[i]
+                max = Math.max(max, idleList[i])
+            }
+            for(let i = 0; i<data.length; i++){
+                process.stdout.write(`${data[i].date}:`);
+                for(let k = 0; k<Math.round((idleList[i]/max)*50); k++){
+                    process.stdout.write('|')
+                }
+                console.log()
+            }
+            if(data.length===1){
+                console.log(`Displayed unplanned (idle) time for ${data[0].date}.`)
+            }else{
+                console.log(`Displayed unplanned (idle) time for dates between ${data[0].date} and ${data[data.length-1].date}.`)
+            }
         }
 
     }

@@ -1,8 +1,6 @@
 const timeSpent = (schedule: any, target: string) => {
     let totalTime = 0
     let reach =0
-    target = target.replace(/\s/g, '')
-    target = target.toLowerCase()
     for(const activity of schedule){
         let name = activity.name
         name = name.toLowerCase()
