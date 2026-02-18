@@ -6,9 +6,9 @@ import { createInterface } from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
 import convTime from './utils/convTime'
 import convHrs from './utils/convHrs'
+import flagHandler from './argUtil/flags'
 
 const parsedFiles: any[]= [];
-let len: number;
 const helpMessage = [
     "cmd 1 - does this",
     "cmd 2 - does that"
@@ -21,7 +21,6 @@ for(const planner of allFiles){
     parsedFiles.push(file)
 }
 parsedFiles.sort((a, b) => a.date.localeCompare(b.date))
-len = parsedFiles.length
 }
 
 async function getAllFiles(filePath: string){
@@ -77,58 +76,8 @@ async function Main (){
             }
         }
 
-        let data = [];
+        let data = flagHandler(arg, parsedFiles, extra)
         // Read flags & store schedules to be processed in data variable
-        try{
-            if(arg[1+extra]==='--all'){
-                data = parsedFiles
-            }else if(arg[1+extra]==='--last'){
-                data = parsedFiles.slice(len-Math.min(len, Number(arg[2])))
-            }else if(arg[1+extra]==='--first'){
-                data = parsedFiles.slice(0, Math.min(len, Number(arg[2])));
-            }else if(arg[1+extra]==='--from'){
-                let from: number = -1;
-                let to: number = -1;
-                if(!isNaN(Number(arg[2+extra]))){
-                    from = Math.min(len-1,Number(arg[2+extra]))-1
-                }else{
-                    for(let i = 0; i<len; i++){
-                        if(parsedFiles[i].date===arg[2+extra]){
-                            from = i;
-                            break;
-                        }
-                    }
-                }
-                if(arg[3+extra]!=='--to'){
-                    to = len
-                }else{
-                if(!isNaN(Number(arg[4+extra]))){
-                    to = Number(arg[4+extra])
-                }else{
-                    for(let i = from+1; i<len; i++){
-                        if(parsedFiles[i].date>arg[4+extra]){
-                            to = i
-                            break;
-                        }else if(parsedFiles[i].date===arg[4+extra]){
-                            to = i+1
-                            break;
-                        }
-                    }
-                }
-                }
-                data = parsedFiles.slice(from, to)
-            }else{
-                if(!isNaN(Number(arg[1+extra]))){
-                    data.push(parsedFiles[Math.min(len,Number(arg[1+extra])-1)])
-                } else {
-                    data.push(parsedFiles.filter(schedule => schedule.date===arg[1+extra]))
-                }
-            }
-
-        }catch(error){
-            console.log(`invalid argument, showing stats for ${cmd} for past ${Math.min(len,7)} days instead!`)
-            data = parsedFiles.slice(len-Math.min(len, 7))
-        }
 
         let totalIdle = 0
         let totalEarliest = 0
