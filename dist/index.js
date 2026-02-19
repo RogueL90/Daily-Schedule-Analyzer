@@ -69,10 +69,15 @@ async function Main() {
                 extra++;
             }
         }
-        // Parses flags and filters parsed schedules into data to be processed
-        let data = (0, flags_1.default)(arg, parsedFiles, extra);
-        // Passes filtered data from flags into user's command to be processed 
-        (0, cmd_1.default)(cmd, data, taskStr);
+        try {
+            // Parses flags and filters parsed schedules into data to be processed
+            let data = (0, flags_1.default)(arg, parsedFiles, extra);
+            // Passes filtered data from flags into user's command to be processed 
+            (0, cmd_1.default)(cmd, data, taskStr);
+        }
+        catch (error) {
+            console.log("invalid input");
+        }
     }
     rl.close();
 }

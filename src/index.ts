@@ -72,12 +72,15 @@ async function Main (){
                 extra++;
             }
         }
-
+        try{
         // Parses flags and filters parsed schedules into data to be processed
         let data = flagHandler(arg, parsedFiles, extra);
 
         // Passes filtered data from flags into user's command to be processed 
         cmdHandler(cmd, data, taskStr);
+        } catch(error){
+            console.log("invalid input")
+        }
 
     }
     rl.close()
